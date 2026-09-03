@@ -1,5 +1,21 @@
 # Project status - Babak Baghaei personal site
 
+## Live
+
+**https://babakbaqaei.github.io** - hosted on GitHub Pages, repo
+`BabakBaqaei/BabakBaqaei.github.io` (a user-site repo, so it serves at the root
+and no Vite `base` path is needed).
+
+Deploys automatically: every push to `main` runs `.github/workflows/deploy.yml`,
+which builds with Vite on GitHub's runners and publishes `dist/` to Pages. No
+local deploy step, and nothing to run by hand.
+
+Netlify was tried first and abandoned: the account was auto-suspended at signup
+("Your account has been suspended"), the usual outcome for the author's region.
+GitHub already hosts the repo without issue and the build runs on GitHub's own
+infrastructure, so Pages sidesteps that entirely.
+
+
 Last updated: 2026-09-02
 
 ## Run
