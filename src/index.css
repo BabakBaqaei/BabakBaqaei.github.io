@@ -1,0 +1,172 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  /* ── Palette ─────────────────────────────────────────────────────────
+     Derived from the one fixed decision in the brief: the page sits on
+     radial-gradient(125% 125% at 50% 10%, #000 40%, #63e 100%). Everything
+     else is tuned to that near-black centre and violet rim.
+
+     Measured against the page background:
+       foreground        #F4F3F7   18.9:1
+       muted-foreground  #9D99B5    7.3:1
+       violet (text)     #A98BFF    7.5:1
+       primary  #6633EE  is 3.1:1 — a FILL colour only, never body text. */
+  --color-background: #050508;
+  --color-foreground: #f4f3f7;
+
+  --color-card: #0b0916;
+  --color-card-foreground: #f4f3f7;
+  --color-popover: #0b0916;
+  --color-popover-foreground: #f4f3f7;
+
+  --color-primary: #6633ee;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #16122a;
+  --color-secondary-foreground: #f4f3f7;
+
+  --color-muted: #12101f;
+  --color-muted-foreground: #9d99b5;
+  --color-accent: #17142b;
+  --color-accent-foreground: #f4f3f7;
+
+  --color-destructive: #f43f5e;
+  --color-destructive-foreground: #ffffff;
+
+  --color-border: color-mix(in srgb, #f4f3f7 12%, transparent);
+  --color-input: color-mix(in srgb, #f4f3f7 14%, transparent);
+  --color-ring: #8a6bff;
+
+  /* Violet that is safe to set type in, unlike --color-primary. */
+  --color-violet: #a98bff;
+
+  --font-heading: 'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-body: 'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+:root {
+  /* Written by useViewportSize / useFaceLayout / useCursorSplit on mount. */
+  --app-vw: 100vw;
+  --app-vh: 100dvh;
+  --op-left: 1;
+  --op-right: 1;
+  /* Flipped per side by useCursorSplit: a label leaves fast and returns slowly. */
+  --dur-left: 160ms;
+  --dur-right: 160ms;
+
+  /* Inset of the shine frame — the page gutters key off the same number. */
+  --frame: 10px;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--color-background);
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+::selection {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+:where(a, button, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ── The one background from the brief, kept verbatim in intent ──────── */
+@utility bg-radial-brand {
+  background: radial-gradient(125% 125% at 50% 10%, #000 40%, #63e 100%);
+}
+
+/* ── ShineBorder: the v4 equivalent of the config snippet in the brief ── */
+@keyframes shine {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+/* The component references this utility directly, so it must survive
+   tree-shaking even though nothing else in the source mentions it. */
+@utility bg-shine-size {
+  background-size: 300% 300%;
+}
+
+@utility animate-shine {
+  animation: shine var(--duration, 14s) infinite linear;
+}
+
+/* ── Role labels ─────────────────────────────────────────────────────
+   On a phone the head fills almost the whole width, so flanking it at the
+   eye line squeezed the type down to 13px. Below md they drop to the foot of
+   the portrait at a readable size instead; the left/right split still reads
+   because they stay on opposite edges. */
+.role-line {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 9%;
+  font-size: clamp(0.95rem, 4.6vw, 1.3rem);
+}
+
+.role-line > span {
+  position: absolute;
+  top: auto;
+  bottom: 0;
+  /* At the foot of the mobile crop the labels sit over the dark suit, so they
+     invert and lean on the hero's scrim. On desktop they sit beside the head
+     against the light studio wall and go back to near-black. */
+  color: #fff;
+  text-shadow: 0 1px 14px rgb(0 0 0 / 0.5);
+}
+
+@media (min-width: 768px) {
+  .role-line {
+    top: var(--eye-y, 34%);
+    bottom: auto;
+    font-size: var(--label-size, 2rem);
+  }
+
+  .role-line > span {
+    top: 0;
+    bottom: auto;
+    transform: translateY(-50%);
+    color: #111;
+    text-shadow: none;
+  }
+}
+
+/* Typewriter caret — kept for hero copy that may return. */
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
