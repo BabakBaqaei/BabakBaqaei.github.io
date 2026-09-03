@@ -25,21 +25,20 @@ export const SOCIALS: { network: Social; href: string }[] = [
 export const FOOTER_LINE =
   "Get in touch with me via social media or send me an email.";
 
-/** Confirmed against the CV — note the "gh...ee" spelling. */
-export const CONTACT_EMAIL = "babakbaghaee7@gmail.com";
-
 /**
  * Where the contact form posts.
  *
- * FormSubmit relays the message straight to CONTACT_EMAIL and needs no account
- * and no server of our own — the only setup is a one-time activation link that
- * arrives in that inbox after the very first submission.
+ * This is FormSubmit's opaque alias for the destination inbox, issued after the
+ * form was activated - deliberately NOT the address itself, so the real email
+ * never appears in this public source or in the built bundle where scrapers
+ * would harvest it. FormSubmit maps the alias to the inbox on its side.
  *
  * To move to another provider (Formspree, Web3Forms, EmailJS, your own
- * endpoint), change this one URL: the form posts plain JSON and only expects
- * JSON back.
+ * endpoint), change this one URL: the form posts plain JSON and expects JSON
+ * back.
  */
-export const CONTACT_ENDPOINT = `https://formsubmit.co/ajax/${CONTACT_EMAIL}`;
+export const CONTACT_ENDPOINT =
+  "https://formsubmit.co/ajax/772b1d4426ecf299456360f4a431c21d";
 
 /** Personal mark. `light` is the white cut, for use on the dark page. */
 export const LOGO = {

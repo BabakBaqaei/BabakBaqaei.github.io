@@ -5,12 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { CONTACT_EMAIL, CONTACT_ENDPOINT } from "@/content/site";
+import { CONTACT_ENDPOINT } from "@/content/site";
 
 type State = "idle" | "sending" | "sent" | "error";
 
 /**
- * Real contact form — the message is relayed to CONTACT_EMAIL.
+ * Real contact form — the message is relayed to the inbox behind
+ * CONTACT_ENDPOINT's alias.
  *
  * There is no server behind this site, so the post goes to FormSubmit, which
  * needs no account of ours. One caveat worth knowing: the very first submission
@@ -117,11 +118,8 @@ export function ContactForm() {
       <div className="mt-5 flex flex-col items-end gap-3">
         {state === "error" ? (
           <p role="alert" className="text-sm text-destructive">
-            That did not go through. Please email me directly at{" "}
-            <a className="underline underline-offset-2" href={`mailto:${CONTACT_EMAIL}`}>
-              {CONTACT_EMAIL}
-            </a>
-            .
+            That did not go through. Please reach me through the links above, or
+            try again in a moment.
           </p>
         ) : null}
 
