@@ -58,11 +58,16 @@ StackedCircularFooter id="contact" - this IS the contact section
 
 ## Next (as of 2026-10-14)
 
-- Hero work is committed locally (2 commits ahead of origin) and **not pushed**:
+- Hero work is committed locally (4 commits ahead of origin) and **not pushed**:
   push = live deploy, wait for Babak's go-ahead.
-- Figma export of the hero was not done: his Figma seat is **View** on the
-  starter team, so files cannot be created from here. Needs an edit seat, or
-  skip it.
+- Figma: file "Babak Baghaei — Hero" https://www.figma.com/design/NAst3jix0Qw4VjXxS5pga8
+  (rest / cursor right / cursor left frames). Frames 4:2-6:2 are the good
+  ones; 1:2-3:2 are a first attempt (scenery too large) - delete them. In 4:2-6:2
+  the hotel-side text runs off the right edge, because Figma ignores SVG
+  `text-anchor="end"`; the site itself is correct. The fixed export (that text
+  as right-aligned HTML) is `.work/figma/hero.html`, built by
+  `.work/figma/build.py`, not yet re-sent: the Starter plan hit its Figma MCP
+  call limit. Re-send with html_to_figma (cssSelector `.frame`) when it resets.
 - Working inputs for `tools/hero-*.py` (frame 31, its mask, gaze steps) are in
   the git-ignored `.work/` folder.
 
