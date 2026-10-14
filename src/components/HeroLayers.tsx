@@ -1,5 +1,6 @@
 import { useEffect, useRef, type Ref } from "react";
 import { FADE_AT } from "@/hooks/useCursorSplit";
+import { HeroDecor } from "@/components/HeroDecor";
 
 /**
  * The split portrait: one head that never moves, illustration on the left of
@@ -54,6 +55,15 @@ const TOWARD_FANTASY: ReadonlyArray<readonly [number, number]> = [
   [1, 0.62],
 ];
 
+/**
+ * Sideways drift toward the cursor at full reveal, as a fraction of the
+ * viewport width. Measured on the reference: the person travels ~95 CSS px
+ * end to end on a 1440px screen, i.e. +-3.3%. The scenery behind drifts less,
+ * which is what makes it read as depth.
+ */
+const SWAY_PERSON = 0.033;
+const SWAY_DECOR = 0.012;
+
 /** How far the seam lags the cursor: a soft follow, not a jump. */
 const TAU_MS = 140;
 
@@ -74,12 +84,20 @@ function revealFor(fraction: number) {
 }
 
 function gazeStep(amount: number) {
-  return Math.round(Math.min(1, Math.max(0, amount) / GAZE_FULL_AT) * GAZE_STEPS);
+  return Math.round(
+    Math.min(1, Math.max(0, amount) / GAZE_FULL_AT) * GAZE_STEPS,
+  );
 }
 
 const pct = (v: number, of: number) => `${(v / of) * 100}%`;
 
-function EyeStrip({ src, stepRef }: { src: string; stepRef: Ref<HTMLDivElement> }) {
+function EyeStrip({
+  src,
+  stepRef,
+}: {
+  src: string;
+  stepRef: Ref<HTMLDivElement>;
+}) {
   return (
     <div
       ref={stepRef}
@@ -100,6 +118,9 @@ function EyeStrip({ src, stepRef }: { src: string; stepRef: Ref<HTMLDivElement> 
 
 export function HeroLayers() {
   const fantasyRef = useRef<HTMLDivElement>(null);
+  const photoRef = useRef<HTMLDivElement>(null);
+  const personRef = useRef<HTMLDivElement>(null);
+  const decorRef = useRef<HTMLDivElement>(null);
   const photoEyesRef = useRef<HTMLDivElement>(null);
   const fantasyEyesRef = useRef<HTMLDivElement>(null);
 
@@ -107,7 +128,11 @@ export function HeroLayers() {
     const fantasy = fantasyRef.current;
     const photoEyes = photoEyesRef.current;
     const fantasyEyes = fantasyEyesRef.current;
-    if (!fantasy || !photoEyes || !fantasyEyes) return;
+    const photo = photoRef.current;
+    const person = personRef.current;
+    const decor = decorRef.current;
+    if (!fantasy || !photoEyes || !fantasyEyes || !photo || !person || !decor)
+      return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
     let target = 0;
@@ -121,6 +146,13 @@ export function HeroLayers() {
       const seam = p >= 0 ? along(TOWARD_PHOTO, p) : along(TOWARD_FANTASY, -p);
       // The illustration is the top layer; everything right of the seam is cut away.
       fantasy.style.clipPath = `inset(0 ${((1 - seam) * 100).toFixed(3)}% 0 0)`;
+      // Both layers are cut-outs now, so each is confined to its own side:
+      // otherwise the photo's soft hair edge shows through beside the ink.
+      photo.style.clipPath = `inset(0 0 0 ${(seam * 100).toFixed(3)}%)`;
+
+      const vw = window.innerWidth;
+      person.style.transform = `translateX(${(p * SWAY_PERSON * vw).toFixed(2)}px)`;
+      decor.style.transform = `translateX(${(p * SWAY_DECOR * vw).toFixed(2)}px)`;
 
       // Sprite rows are written only when the step changes.
       const ps = gazeStep(p);
@@ -177,38 +209,57 @@ export function HeroLayers() {
       className="absolute left-1/2 top-1/2 z-0 aspect-video -translate-x-1/2 -translate-y-1/2"
       style={{ width: "max(100%, calc(var(--app-vh) * 16 / 9))" }}
     >
-      {/* Photograph: full frame, underneath. */}
-      <div className="absolute inset-0">
-        <img
-          src={PHOTO_SRC}
-          alt="Babak Baghaei, half photograph and half illustration"
-          width={SRC_W}
-          height={SRC_H}
-          fetchPriority="high"
-          draggable={false}
-          className={fill}
-        />
-        <EyeStrip src={PHOTO_EYES} stepRef={photoEyesRef} />
+      {/* Scenery: behind the person, drifting less than they do. */}
+      <div
+        ref={decorRef}
+        className="absolute inset-0"
+        style={{ willChange: "transform" }}
+      >
+        <HeroDecor />
       </div>
 
-      {/* Illustration: on top, cut at the seam. The inline clip is the resting
-          state (seam on the nose line), so the split holds without any script. */}
       <div
-        ref={fantasyRef}
-        aria-hidden
+        ref={personRef}
         className="absolute inset-0"
-        style={{ clipPath: "inset(0 50% 0 0)", willChange: "clip-path" }}
+        style={{ willChange: "transform" }}
       >
-        <img
-          src={FANTASY_SRC}
-          alt=""
-          width={SRC_W}
-          height={SRC_H}
-          fetchPriority="high"
-          draggable={false}
-          className={fill}
-        />
-        <EyeStrip src={FANTASY_EYES} stepRef={fantasyEyesRef} />
+        {/* Photograph: right of the seam. */}
+        <div
+          ref={photoRef}
+          className="absolute inset-0"
+          style={{ clipPath: "inset(0 0 0 50%)", willChange: "clip-path" }}
+        >
+          <img
+            src={PHOTO_SRC}
+            alt="Babak Baghaei, half photograph and half illustration"
+            width={SRC_W}
+            height={SRC_H}
+            fetchPriority="high"
+            draggable={false}
+            className={fill}
+          />
+          <EyeStrip src={PHOTO_EYES} stepRef={photoEyesRef} />
+        </div>
+
+        {/* Illustration: on top, cut at the seam. The inline clip is the resting
+          state (seam on the nose line), so the split holds without any script. */}
+        <div
+          ref={fantasyRef}
+          aria-hidden
+          className="absolute inset-0"
+          style={{ clipPath: "inset(0 50% 0 0)", willChange: "clip-path" }}
+        >
+          <img
+            src={FANTASY_SRC}
+            alt=""
+            width={SRC_W}
+            height={SRC_H}
+            fetchPriority="high"
+            draggable={false}
+            className={fill}
+          />
+          <EyeStrip src={FANTASY_EYES} stepRef={fantasyEyesRef} />
+        </div>
       </div>
     </div>
   );

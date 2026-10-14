@@ -175,6 +175,30 @@ across the site on 2026-09-02.
   x0.40, warm shift +1/+1/-7, levels on luminance only 52->0 / 224->255,
   gamma 0.96. Result: saturation 42, skin 186/170/155, hair at ink black.
   Ink and masks are still computed from the *ungraded* frame.
+- **White page, cut-out person** (2026-10-14). The reference's background is
+  pure `#FFFFFF` (sampled), so the hero section is `bg-white` and both halves
+  are RGBA WebPs (`tools/hero-cutout.py`): rembg alpha (254 inside the body ->
+  250+ treated as opaque), edge colours *decontaminated* of the grey wall
+  (F = (I - (1-a)B)/a) so no grey fringe rings the person, then graded. Near the
+  illustrated head the alpha is the head's own coverage, or the photo's soft
+  hair edge shows as grey wisps outside the ink. Each layer is also clipped to
+  its own side of the seam, for the same reason.
+- **The person drifts toward the cursor**, like the reference (measured there:
+  ~95 CSS px end to end at 1440 wide = +-3.3% of the viewport, cross-correlated
+  between frames of the same state). `SWAY_PERSON 0.033`; the scenery drifts
+  `SWAY_DECOR 0.012`, less, so it reads as depth.
+- **Scenery behind the shoulders** - `HeroDecor.tsx`, an SVG in the same
+  1920x1080 frame coordinates. Left (coding + trading): JetBrains Mono code
+  lines, EUR/USD quote, an 11-candle chart with a violet moving average, a
+  stop/target object. Right (hotel): Playfair Display italic greeting and
+  "Suite 1204", check-in/out times, five stars, a line-drawn service bell,
+  OCC/ADR/RevPAR (RevPAR = 0.92 x 410 = 377, keep them consistent). Inks are
+  violet-tinted greys `#D6D1E4` / `#C7C0DC` + `#A98BFF` accents: texture, not
+  content. Each side fades with its label. Fonts are self-hosted via
+  @fontsource (400 / 400 italic only). Fonts and pairing came from the
+  ui-ux-pro-max skill. On phones the crop hides it entirely.
+- **Bottom fade is short (h-20/24).** The tall fade made sense on the grey wall;
+  on white it painted a grey band across the hero.
 - **Seam travel is measured.** Head spans x 0.382-0.613; the illustration
   differs from the photo only within x 0.209-0.614. `TOWARD_PHOTO` crosses the
   face over 88% of the travel and then clears the wall splashes; full reveal at

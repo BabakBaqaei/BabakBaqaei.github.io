@@ -219,4 +219,7 @@ illu[ink] = INK
 out = out * (1 - h) + illu * h
 Image.fromarray(out.clip(0, 255).astype(np.uint8)).save(out_p)
 np.save(out_p + ".head.npy", head)
+# Layers for the cut-out export (hero-cutout.py): head coverage, wall paint.
+np.savez_compressed(out_p + ".layers.npz", head_h=h[..., 0].astype(np.float32),
+                    wall_a=wall_a.astype(np.float32), wall_rgb=wall_rgb.astype(np.float32))
 print("saved", out_p)

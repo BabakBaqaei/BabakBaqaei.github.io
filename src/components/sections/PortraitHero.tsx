@@ -12,15 +12,15 @@ export function PortraitHero() {
   return (
     <section
       id="top"
-      className="relative h-[var(--app-vh)] w-full overflow-hidden"
+      className="relative h-[var(--app-vh)] w-full overflow-hidden bg-white"
     >
       <HeroLayers />
       <RoleLabels />
 
-      {/* Dissolves the bright studio grey into the dark page below. */}
+      {/* Dissolves the white hero (and the suit) into the dark page below. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-52 bg-gradient-to-b from-transparent to-background md:h-56"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-b from-transparent to-background md:h-24"
       />
     </section>
   );
