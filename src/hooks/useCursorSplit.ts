@@ -6,7 +6,7 @@ import { useEffect } from "react";
  * width rather than at the very edge — you no longer have to shove the pointer
  * into the corner to clear a label.
  */
-const FADE_AT = 0.8;
+export const FADE_AT = 0.8;
 
 /** Leaving is quick; coming back is slow enough to read as an animation. */
 const OUT_MS = 110;

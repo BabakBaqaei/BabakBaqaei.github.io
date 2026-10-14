@@ -2,8 +2,9 @@ export const LEFT_LABEL = "coder & trader";
 export const RIGHT_LABEL = "hotel manager";
 
 /**
- * Landmarks measured off `public/video/hero.mp4`, normalised to the source
- * frame (1920x1080). Taken from the footage rather than eyeballed:
+ * Landmarks measured off the hero take, normalised to the source frame
+ * (1920x1080). The stills in `public/images/hero/` are frames of that same
+ * take, so these still hold. Taken from the footage rather than eyeballed:
  *
  * - EYE_Y      pupils sit on this line (verified against a drawn guide)
  * - HEAD_LEFT  \ widest horizontal extent of the head **within the eye band**,

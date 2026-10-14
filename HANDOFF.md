@@ -16,7 +16,7 @@ GitHub already hosts the repo without issue and the build runs on GitHub's own
 infrastructure, so Pages sidesteps that entirely.
 
 
-Last updated: 2026-09-02
+Last updated: 2026-10-13
 
 ## Run
 
@@ -35,7 +35,7 @@ Vite 7 + React 19 + TypeScript + Tailwind v4 + shadcn structure (`components.jso
 
 ```
 Header (fixed)        About - Experience - Contact
-PortraitHero          mouse-tracked clip + role labels, one screen tall
+PortraitHero          split portrait, cursor slides the seam + role labels
 About                 condensed lead + Read more, then Capabilities (always
                       shown, three columns), portrait flush inside the frame,
                       sticky and capped at a screenful
@@ -133,15 +133,52 @@ across the site on 2026-09-02.
 - **Header is `fixed`, not `sticky`.** Sticky occupies a row in the flow and
   pushed the full-height hero down by its own height.
 - **Hero landmarks are measured, not guessed.** `EYE_Y 0.34`,
-  `HEAD_LEFT 0.344`, `HEAD_RIGHT 0.623`. The turn window was `2.35 / 3.55 /
-  4.45s` in the original take; the shipped clip is cut to it, so the marks are
-  now `0 / 1.2 / 2.1`. Re-measure if the clip is replaced.
-- **The hero clip is all-intra on purpose.** Every frame is a keyframe. A normal
-  long-GOP file has to decode forward from the previous keyframe on every mouse
-  move: measured in-page, seeks averaged **110ms (max 138ms)** on the old file
-  against **11ms** on this one. That was the head lagging the cursor. If the
-  clip is ever re-encoded, keep `-g 1 -keyint_min 1 -sc_threshold 0` or the lag
-  comes straight back.
+  `HEAD_LEFT 0.344`, `HEAD_RIGHT 0.623`. The stills are frames of the same
+  take, so these still hold. Re-measure if the stills come from a new shoot.
+- **The hero is one frame split by a sliding seam** (`HeroLayers.tsx`,
+  rebuilt 2026-10-13 to match the reference Babak gave, `Desktop/ax/111.mp4`).
+  Illustration left of a vertical seam, photograph right of it; the cursor
+  slides the seam *across a head that never moves* (toward the right the photo
+  takes the face, toward the left the illustration does) and the eyes on each
+  side turn to follow it. Rest = seam on the nose line, both halves at the lens.
+  A first attempt stacked three *different* frames (head turned left / front /
+  right) and wiped between them; heads did not line up, so slivers of a turned
+  head floated beside the face. Do not go back to multiple poses.
+- **Everything is frame 31 (1.25s) of `unused-media/hero-original-6s.mp4`.**
+  Photo, illustration and every gaze step differ only inside the eye strip
+  `x 840-1096, y 308-404` (verified by pixel diff), so nothing else can ever
+  show a seam.
+- **The gaze is the real iris, moved** - `tools/hero-gaze.py`. Every
+  sideways-gaze frame in the take is motion-blurred (eye Laplacian variance
+  45-90 vs 633 on frame 31), so eyes are not borrowed from other frames. A 1-D
+  horizontal warp inside each eye opening slides the iris intact, stretches
+  the sclera on one side, and fades out above/below so lids and brows stay.
+  Pixels outside the warp are copied bit-exact - the spline otherwise rounds
+  some by 1, enough to flip thresholds in the illustration.
+- **Eye sprites, not cross-fades.** `photo-eyes.webp` / `fantasy-eyes.webp` are
+  9 rows (gaze 0..8px) of just the eye strip; the step follows the seam
+  (`GAZE_FULL_AT 0.55`), so the eyes slide instead of ghosting.
+- **The illustration is the reference's look, computed** -
+  `tools/hero-illustrate.py`, seed 9. Head (skin + hair) only; clothes stay
+  photographic. Paper white base, dry-brush strokes in the reference palette
+  (teal `#93BEC0`, mustard `#E2B055`, blush `#E8B9AC`, coral `#C94A3F`, sampled
+  off the recording) with bristle gaps at the edges and a drying tail, paint
+  flecks, solid black ink from the frame's own darks on top, the whites of the
+  eyes kept paper so the gaze reads, and dry strokes on the wall behind the
+  frame-left shoulder. No generated face anywhere.
+- **The photo half is graded like the reference's** - `tools/hero-grade.py`,
+  applied to the photo, every photo gaze step, and the photographic parts of
+  the illustration (backdrop arg of `hero-illustrate.py`, so the seam stays
+  invisible on wall and suit). Measured on the reference's real half: skin
+  saturation 40 (ours was 75), skin mean RGB 185/170/155 (ours 193/153/137,
+  pinker), darks at true black (ours bottomed out at L 59). Grade: saturation
+  x0.40, warm shift +1/+1/-7, levels on luminance only 52->0 / 224->255,
+  gamma 0.96. Result: saturation 42, skin 186/170/155, hair at ink black.
+  Ink and masks are still computed from the *ungraded* frame.
+- **Seam travel is measured.** Head spans x 0.382-0.613; the illustration
+  differs from the photo only within x 0.209-0.614. `TOWARD_PHOTO` crosses the
+  face over 88% of the travel and then clears the wall splashes; full reveal at
+  `FADE_AT` (0.8), the same point the opposite label is gone.
 - **The footer seam is masked, not painted over.** Covering the top of the clip
   with a gradient of `--color-background` leaves a visible band, because the page
   behind is a *radial* gradient and that flat colour only matches it dead centre.
@@ -158,7 +195,10 @@ across the site on 2026-09-02.
 
 | file | note |
 |---|---|
-| `public/video/hero.mp4` | 1920x1080, 20fps, 2.15s, **all-intra**, no audio, 1.53MB. Cut from the 6s original to the turn window and re-encoded for instant seeking (SSIM 0.991 against source). |
+| `public/images/hero/photo.webp` | frame 31, the photograph half, 75KB |
+| `public/images/hero/fantasy.webp` | frame 31 illustrated, 88KB |
+| `public/images/hero/photo-eyes.webp` / `fantasy-eyes.webp` | 256x864 sprites, 9 gaze steps each |
+| `unused-media/hero-allintra-2s.mp4` | the retired scrubbed hero clip (all-intra), kept in case the video hero returns |
 | `unused-media/hero-original-6s.mp4` | the untrimmed 6s take, kept for re-measuring |
 | `public/video/footer.mp4` | 1.23MB, transcoded from a 14MB 4K source |
 | `public/brand/logo-bb.png` | ink monogram, for light surfaces (header over hero) |
