@@ -62,6 +62,8 @@ const TOWARD_FANTASY: ReadonlyArray<readonly [number, number]> = [
  * which is what makes it read as depth.
  */
 const SWAY_PERSON = 0.033;
+/** ~3 source px: enough to cover the antialiased edge of the illustration's clip. */
+const SEAM_OVERLAP = 0.0015;
 const SWAY_DECOR = 0.012;
 
 /** How far the seam lags the cursor: a soft follow, not a jump. */
@@ -148,7 +150,10 @@ export function HeroLayers() {
       fantasy.style.clipPath = `inset(0 ${((1 - seam) * 100).toFixed(3)}% 0 0)`;
       // Both layers are cut-outs now, so each is confined to its own side:
       // otherwise the photo's soft hair edge shows through beside the ink.
-      photo.style.clipPath = `inset(0 0 0 ${(seam * 100).toFixed(3)}%)`;
+      // The photo reaches SEAM_OVERLAP under the illustration: two clips that
+      // meet on a fractional pixel are each half-transparent there, and the
+      // white page showed through as a hairline down the tie and the suit.
+      photo.style.clipPath = `inset(0 0 0 ${((seam - SEAM_OVERLAP) * 100).toFixed(3)}%)`;
 
       const vw = window.innerWidth;
       person.style.transform = `translateX(${(p * SWAY_PERSON * vw).toFixed(2)}px)`;
@@ -227,7 +232,7 @@ export function HeroLayers() {
         <div
           ref={photoRef}
           className="absolute inset-0"
-          style={{ clipPath: "inset(0 0 0 50%)", willChange: "clip-path" }}
+          style={{ clipPath: "inset(0 0 0 49.85%)", willChange: "clip-path" }}
         >
           <img
             src={PHOTO_SRC}

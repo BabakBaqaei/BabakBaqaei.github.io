@@ -212,6 +212,20 @@ across the site on 2026-09-02.
   content. Each side fades with its label. Fonts are self-hosted via
   @fontsource (400 / 400 italic only). Fonts and pairing came from the
   ui-ux-pro-max skill. On phones the crop hides it entirely.
+- **Two grades, split by a face mask** (2026-10-14, Babak's request). Skin of
+  face, ears and neck (`.work/face_soft.npy`, skin classifier + hole fill +
+  closing, feathered 5px) keeps the reference grade (black point 52). Hair,
+  suit and tie get the same colour with black point 12 / white 232, gamma 1:
+  the crushed version flattened his hair and made the suit look painted.
+  Face pixels verified unchanged (mean diff 1.6, i.e. WebP noise).
+- **Seam overlap.** The photo layer reaches `SEAM_OVERLAP` (0.15%, ~3 source
+  px) under the illustration. Two clips meeting on a fractional pixel left a
+  white hairline down the tie and suit.
+- **Scenery v2.** Right side is now one line-drawn grand hotel under five stars
+  (no text), its base and near wing behind the right shoulder. Left: two code
+  lines that run in behind the neck, EUR/USD, a candle chart sinking behind the
+  shoulder. The illustration's paint splash moved to the low outer edge of the
+  left shoulder (as in the reference) to free that space.
 - **Bottom fade is short (h-20/24).** The tall fade made sense on the grey wall;
   on white it painted a grey band across the hero.
 - **Seam travel is measured.** Head spans x 0.382-0.613; the illustration

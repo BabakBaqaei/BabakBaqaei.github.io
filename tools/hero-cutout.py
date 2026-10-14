@@ -24,12 +24,26 @@ EYES = (840, 308, 1096, 404)
 LUMA = np.array([0.299, 0.587, 0.114])
 
 
-def grade(a):
+# Hair, suit and tie: the same colour, but blacks that keep their texture.
+# The face's black point (52) crushed the hair to a flat shape and made the
+# suit and tie look painted on; the face itself keeps the reference grade.
+BODY_BLACK, BODY_WHITE, BODY_GAMMA = 12.0, 232.0, 1.0
+
+
+def _grade(a, black, white, gamma):
     Y = (a @ LUMA)[..., None]
     b = Y + (a - Y) * SAT + WARM
     Yb = (b @ LUMA)[..., None]
-    Yn = np.clip((Yb - BLACK) / (WHITE - BLACK), 0, 1) ** GAMMA * 255
+    Yn = np.clip((Yb - black) / (white - black), 0, 1) ** gamma * 255
     return (b + (Yn - Yb)).clip(0, 255)
+
+
+# Face, ears and neck skin (feathered 5px), from hero-face-mask in .work.
+FACE = np.load(f"{HERE}/face_soft.npy")[..., None]
+
+
+def grade(a):
+    return _grade(a, BLACK, WHITE, GAMMA) * FACE + _grade(a, BODY_BLACK, BODY_WHITE, BODY_GAMMA) * (1 - FACE)
 
 
 m = np.asarray(Image.open(f"{HERE}/src/f031_mask.png"), float)

@@ -181,9 +181,12 @@ paint_a[:] = 0
 # Anchor: just outside the frame-left shoulder line, so the strokes rise from
 # behind it as in the reference.
 pcols = np.where(person.any(0))[0]
-shoulder_x = xs.min() - fw * 0.38
+# Low on the outer edge of the frame-left shoulder, as in the reference: the
+# strokes rise from behind the shoulder where it falls away (source x ~380,
+# shoulder line y ~1010 there), leaving the space by the neck for the code.
+shoulder_x = xs.min() - fw * 0.80
 shoulder_y = np.argmax(person[:, int(shoulder_x)]) if person[:, int(shoulder_x)].any() else bot
-sx, sy = shoulder_x - 30, shoulder_y - 40
+sx, sy = shoulder_x - 20, shoulder_y - 120
 for _ in range(7):
     ang = np.deg2rad(rng.uniform(-80, -55))
     ln = rng.uniform(120, 260)
