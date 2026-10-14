@@ -138,6 +138,16 @@ export const CERTIFICATES: Credential[] = [
     },
   },
   {
+    title: "Financial Intelligence Program",
+    issuer: "Samadi Capital Academy - Certificate of Completion",
+    date: "Feb 2024",
+    note: "Financial awareness, money management, investment principles, risk management and responsible financial decision-making.",
+    verify: {
+      label: "SCA-FI-2026-000013",
+      href: "https://samadicapital.com/verify/SCA-FI-2026-000013",
+    },
+  },
+  {
     title: "Professional Conduct and Business Etiquette",
     issuer: "Mizban University of Applied Science and Technology",
     date: "Jun 2024",
@@ -155,12 +165,23 @@ export const CERTIFICATES: Credential[] = [
 ];
 
 /**
- * The trading certificate itself, shown beside the list. It is the only
- * credential on the page a stranger can check independently, so it is the one
- * worth showing rather than describing.
+ * The two Samadi Capital certificates, shown as documents beside the list.
+ * They are the only credentials on the page a stranger can check
+ * independently, so they are the ones worth showing rather than describing.
  */
-export const CERTIFICATE_IMAGE = {
-  src: "/images/certificate-trading.webp",
-  alt: "Certificate of Trading Proficiency awarded to Babak Baghaei by Samadi Capital Academy on 13 July 2026, certificate ID SCA-TR-2026-000001.",
-  href: "https://samadicapital.com/verify/SCA-TR-2026-000001",
-};
+export const CERTIFICATE_IMAGES = [
+  {
+    src: "/images/certificate-trading.webp",
+    title: "Trading Proficiency",
+    caption: "Samadi Capital Academy · issued 13 July 2026",
+    alt: "Certificate of Trading Proficiency awarded to Babak Baghaei by Samadi Capital Academy on 13 July 2026, certificate ID SCA-TR-2026-000001.",
+    href: "https://samadicapital.com/verify/SCA-TR-2026-000001",
+  },
+  {
+    src: "/images/certificate-financial-intelligence.webp",
+    title: "Financial Intelligence Program",
+    caption: "Samadi Capital Academy · awarded 20 February 2024",
+    alt: "Certificate of Completion for the Financial Intelligence Program awarded to Babak Baghaei by Samadi Capital Academy on 20 February 2024, certificate ID SCA-FI-2026-000013.",
+    href: "https://samadicapital.com/verify/SCA-FI-2026-000013",
+  },
+];

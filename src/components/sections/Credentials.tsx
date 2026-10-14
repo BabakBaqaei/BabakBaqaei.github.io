@@ -1,87 +1,86 @@
 import { Section } from "@/components/ui/section";
 import { Reveal } from "@/components/ui/reveal";
-import { CERTIFICATE_IMAGE, CERTIFICATES, type Credential } from "@/content/resume";
+import { CERTIFICATE_IMAGES, CERTIFICATES, type Credential } from "@/content/resume";
 
-function Row({ item }: { item: Credential }) {
+/** Small diagonal arrow for outbound links. */
+function Outbound() {
   return (
-    <li className="grid gap-1 border-t border-border py-5 md:grid-cols-[1fr_auto] md:items-baseline md:gap-6">
-      <div>
-        <p className="text-[1.02rem] font-medium">{item.title}</p>
-        <p className="mt-1 text-sm text-foreground/65">{item.issuer}</p>
-        {item.note ? (
-          <p className="mt-2 max-w-[52ch] text-sm leading-relaxed text-foreground/55">
-            {item.note}
-          </p>
-        ) : null}
-        {item.verify ? (
-          <a
-            href={item.verify.href}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-2 inline-block text-xs tracking-wide text-violet underline underline-offset-4 transition-opacity hover:opacity-75"
-          >
-            Verify - {item.verify.label}
-          </a>
-        ) : null}
-      </div>
-      <p className="text-sm whitespace-nowrap text-violet md:text-right">
-        {item.date}
-      </p>
+    <svg aria-hidden viewBox="0 0 16 16" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={1.6}>
+      <path d="M5 11 11 5M6 5h5v5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function CredentialCard({ item }: { item: Credential }) {
+  return (
+    <li className="glass group flex h-full flex-col rounded-2xl p-5 transition-[transform,border-color] duration-300 hover:-translate-y-1 hover:border-violet/40">
+      <span className="font-mono text-[0.66rem] tracking-[0.16em] text-violet uppercase">{item.date}</span>
+      <p className="mt-3 text-[1rem] leading-snug font-medium">{item.title}</p>
+      <p className="mt-1.5 text-sm leading-relaxed text-foreground/60">{item.issuer}</p>
     </li>
   );
 }
 
 /**
- * Certificates as a plain list on the left, with the trading certificate itself
- * facing them on the right.
+ * The two Samadi Capital certificates as documents, side by side in glass
+ * frames - the only credentials a stranger can verify, so they are shown, not
+ * described - and the rest as a grid of glass cards beneath.
  *
- * A list rather than cards: these are facts to be scanned, and a grid of boxes
- * would give each one more visual weight than it earns. The one document that
- * can be verified independently is shown as the artefact it is — a checkable
- * credential is worth far more than a claimed result — and the two columns are
- * centred against each other so neither hangs below the other.
+ * The documents are cream on a near-black page, so they sit a little back
+ * (opacity 0.9) inside their frame and come up to full strength on hover,
+ * rather than glaring at full brightness against everything around them.
  */
 export function Credentials() {
+  const others = CERTIFICATES.filter((c) => !c.verify);
+
   return (
     <Section id="credentials" label="Certificates">
-      <div
-        className="grid gap-10 md:grid-cols-[1fr_minmax(0,46%)] md:items-center md:gap-14"
-        style={{ fontFamily: "var(--font-heading)" }}
-      >
-        <Reveal>
-          <ul>
-            {CERTIFICATES.map((item) => (
-              <Row key={item.title + item.date} item={item} />
+      <div style={{ fontFamily: "var(--font-heading)" }}>
+        <div className="grid gap-6 md:grid-cols-2 md:gap-8">
+          {CERTIFICATE_IMAGES.map((doc, i) => (
+            <Reveal key={doc.src} delay={i * 90}>
+              <figure className="glass group rounded-[22px] p-2.5 transition-[transform,box-shadow] duration-500 hover:-translate-y-1 hover:shadow-[0_24px_70px_-24px_rgba(169,139,255,0.45)]">
+                <a
+                  href={doc.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={`Verify: ${doc.title}`}
+                  className="block overflow-hidden rounded-[15px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet"
+                >
+                  <img
+                    src={doc.src}
+                    alt={doc.alt}
+                    width={1800}
+                    height={1273}
+                    decoding="async"
+                    className="w-full opacity-90 transition-[opacity,transform] duration-700 group-hover:scale-[1.015] group-hover:opacity-100"
+                  />
+                </a>
+                <figcaption className="flex items-center justify-between gap-4 px-2.5 pt-3.5 pb-1.5">
+                  <span>
+                    <span className="block text-[0.98rem] font-medium">{doc.title}</span>
+                    <span className="mt-0.5 block text-xs text-foreground/55">{doc.caption}</span>
+                  </span>
+                  <a
+                    href={doc.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-violet/30 bg-violet/10 px-3 py-1.5 text-xs text-violet transition-colors hover:bg-violet/20"
+                  >
+                    Verify <Outbound />
+                  </a>
+                </figcaption>
+              </figure>
+            </Reveal>
+          ))}
+        </div>
+
+        <Reveal delay={120}>
+          <ul className="mt-6 grid gap-4 sm:grid-cols-2 md:mt-8 lg:grid-cols-3">
+            {others.map((item) => (
+              <CredentialCard key={item.title + item.date} item={item} />
             ))}
           </ul>
-        </Reveal>
-
-        <Reveal delay={90}>
-          {/* The document is cream on a near-black page, so it is framed and
-              held slightly back rather than dropped in at full strength, which
-              would glare against everything around it. No drop shadow: black on
-              near-black is not depth, it is a smudge. */}
-          <figure className="group">
-            <a
-              href={CERTIFICATE_IMAGE.href}
-              target="_blank"
-              rel="noreferrer"
-              className="block overflow-hidden rounded-xl ring-1 ring-border transition-transform duration-500 hover:scale-[1.02]"
-            >
-              <img
-                src={CERTIFICATE_IMAGE.src}
-                alt={CERTIFICATE_IMAGE.alt}
-                width={1800}
-                height={1273}
-                loading="lazy"
-                decoding="async"
-                className="w-full opacity-90 transition-opacity duration-500 group-hover:opacity-100"
-              />
-            </a>
-            <figcaption className="mt-3 text-xs tracking-wide text-foreground/50">
-              Samadi Capital Academy &middot; issued 13 July 2026
-            </figcaption>
-          </figure>
         </Reveal>
       </div>
     </Section>
