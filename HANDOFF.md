@@ -56,6 +56,16 @@ StackedCircularFooter id="contact" - this IS the contact section
 | `src/content/resume.ts` | career roles (**oldest first**), skill groups, certificates, cert image |
 | `src/content/labels.ts` | hero role labels + measured face landmarks |
 
+## Next (as of 2026-10-14)
+
+- Hero work is committed locally (2 commits ahead of origin) and **not pushed**:
+  push = live deploy, wait for Babak's go-ahead.
+- Figma export of the hero was not done: his Figma seat is **View** on the
+  starter team, so files cannot be created from here. Needs an edit seat, or
+  skip it.
+- Working inputs for `tools/hero-*.py` (frame 31, its mask, gaze steps) are in
+  the git-ignored `.work/` folder.
+
 ## Open questions for Babak
 
 1. **Career dates for the two new strands.** Markets shows `2022 - Present`,
