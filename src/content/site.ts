@@ -7,8 +7,15 @@ export type NavItem = { label: string; href: string };
 export const NAV: NavItem[] = [
   { label: "About", href: "#about" },
   { label: "Experience", href: "#experience" },
+  { label: "Certificates", href: "#credentials" },
   { label: "Contact", href: "#contact" },
 ];
+
+/** Section ids in page order, for the active-section tracking. */
+export const SECTION_IDS = ["top", "about", "experience", "credentials", "contact"];
+
+/** One line under the name in the side menu and the contact sheet. */
+export const ROLE_LINE = "Hotel operations manager · trader · web designer";
 
 export type Social = "linkedin" | "twitter" | "telegram" | "instagram";
 

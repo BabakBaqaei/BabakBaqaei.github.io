@@ -15,7 +15,7 @@ import {
 } from "@/content/about";
 
 /**
- * The three skill groups, side by side.
+ * The three skill groups, side by side, each on its own glass card.
  *
  * They sit under the Read more button and stay there whether it is open or
  * shut: closed, the lead paragraph alone left a tall empty column beside the
@@ -33,10 +33,14 @@ function Capabilities() {
         {CAPABILITIES_LABEL}
       </h3>
 
-      <div className="mt-6 grid gap-x-5 gap-y-7 sm:grid-cols-3">
-        {SKILLS.map((group) => (
-          <div key={group.title}>
-            <p className="text-[0.6rem] leading-[1.5] font-semibold tracking-[0.14em] text-foreground/55 uppercase">
+      <div className="mt-6 grid gap-3 sm:grid-cols-3">
+        {SKILLS.map((group, i) => (
+          <div
+            key={group.title}
+            className="glass rounded-2xl p-4 transition-[transform,border-color] duration-300 hover:-translate-y-1 hover:border-violet/35"
+          >
+            <span className="font-mono text-[0.62rem] text-violet/80">0{i + 1}</span>
+            <p className="mt-1.5 text-[0.62rem] leading-[1.5] font-semibold tracking-[0.14em] text-foreground/70 uppercase">
               {group.title}
             </p>
             <ul className="mt-3 grid gap-1.5">

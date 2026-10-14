@@ -1,4 +1,7 @@
 import { Header } from "@/components/ui/header-1";
+import { SideMenu } from "@/components/ui/side-menu";
+import { QuickSheet, Fab } from "@/components/ui/quick-sheet";
+import { TabBar } from "@/components/ui/tab-bar";
 import { StackedCircularFooter } from "@/components/ui/stacked-circular-footer";
 import { RadialBackground } from "@/components/ui/tailwind-css-background-snippet";
 import { PageFrame } from "@/components/PageFrame";
@@ -14,6 +17,7 @@ export default function App() {
   useViewportSize();
   useFaceLayout();
   useCursorSplit();
+
 
   return (
     <>
@@ -32,6 +36,13 @@ export default function App() {
       </main>
 
       <StackedCircularFooter />
+
+      {/* Floating glass chrome: side menu, quick-contact sheet, desktop FAB,
+          mobile tab bar (with the FAB raised in its centre). */}
+      <Fab />
+      <TabBar />
+      <SideMenu />
+      <QuickSheet />
     </>
   );
 }

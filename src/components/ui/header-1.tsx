@@ -1,147 +1,98 @@
-"use client";
-import React from "react";
-import { buttonVariants } from "@/components/ui/button";
-import { Button } from "@/components/ui/button";
+import { Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LogoMark } from "@/components/ui/logo-mark";
-import { MenuToggleIcon } from "@/components/ui/menu-toggle-icon";
 import { usePastHero } from "@/components/ui/use-past-hero";
-import { createPortal } from "react-dom";
-import { NAV } from "@/content/site";
+import { useActiveSection, useScrollFraction } from "@/hooks/useActiveSection";
+import { toggleOverlay, useOverlay } from "@/lib/overlay-store";
+import { NAV, SECTION_IDS } from "@/content/site";
 
 /**
- * Fixed header, and it flips with what is behind it.
+ * Fixed header that changes with what is behind it.
  *
- * Over the hero the backdrop is a light studio wall, so the mark and links run
- * in ink with no panel behind them. Once the hero has scrolled away the page is
- * near-black, so the header picks up its glass panel and everything inverts to
- * white. A single white treatment would have been invisible over the portrait.
+ * Over the hero (a white page) it is just the mark and the links in ink, no
+ * panel - the reference keeps its hero clean. Once the hero has scrolled away
+ * the page is near-black, and the header gathers into a floating glass pill:
+ * mark, links with the current section lit, a menu button for the side menu,
+ * and a hairline along its foot that fills with reading progress
+ * (ui-ux-pro-max: scroll storytelling wants a progress indicator).
  *
- * `fixed` rather than the registry's `sticky`: a sticky header still occupies
- * a row in the flow, which pushed the full-height hero down by its own height
- * and cropped the bottom of the portrait. Fixed takes it out of the flow so the
- * hero really is one screen tall, and the scrolled state behaves identically.
- *
- * The registry version also ships Sign In / Get Started and a wordmark for
- * another brand; all dropped — this is a personal site with three destinations
- * and no product funnel.
+ * `fixed`, not sticky: a sticky header occupies a row in the flow and pushed
+ * the full-height hero down by its own height.
  */
 export function Header() {
-  const [open, setOpen] = React.useState(false);
   const pastHero = usePastHero(72);
-
-  React.useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [open]);
+  const active = useActiveSection(SECTION_IDS);
+  const progress = useScrollFraction();
+  const menuOpen = useOverlay() === "menu";
 
   return (
-    <header
-      className={cn(
-        "fixed top-0 right-0 left-0 z-50 border-b border-transparent transition-colors duration-300",
-        {
-          "bg-background/80 supports-[backdrop-filter]:bg-background/50 border-border backdrop-blur-lg":
-            pastHero,
-        },
-      )}
-    >
-      {/* Full width on purpose — no centred max-width column, so the mark
-          and the links sit out at the edges of the frame. */}
-      <nav className="flex h-16 w-full items-center justify-between px-5 md:px-8">
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-50 px-3 pt-3 md:px-5">
+      <nav
+        aria-label="Primary"
+        className={cn(
+          "pointer-events-auto relative mx-auto flex h-14 items-center justify-between overflow-hidden rounded-full px-2 transition-[max-width,background-color,border-color,box-shadow] duration-500",
+          pastHero ? "glass-strong max-w-5xl ps-4" : "max-w-none border border-transparent bg-transparent ps-2",
+        )}
+      >
         <a
           href="#top"
           aria-label="Back to top"
-          className="-ml-2 rounded-md p-2 transition-colors hover:bg-white/10"
+          className="rounded-full p-2 transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-violet"
         >
-          <LogoMark height={26} tone={pastHero ? "light" : "ink"} />
+          <LogoMark height={24} tone={pastHero ? "light" : "ink"} />
         </a>
 
-        <div className="hidden items-center gap-1 md:flex">
-          {NAV.map((link) => (
-            <a
-              key={link.label}
-              className={buttonVariants({
-                variant: "ghost",
-                className: cn(
-                  "transition-colors",
-                  pastHero
-                    ? "text-foreground hover:bg-accent"
-                    : "text-[#111] hover:bg-black/5",
-                ),
-              })}
-              href={link.href}
-            >
-              {link.label}
-            </a>
-          ))}
+        <div className="flex items-center gap-1">
+          <ul className="hidden items-center gap-0.5 md:flex">
+            {NAV.map((link) => {
+              const isActive = link.href === `#${active}`;
+              return (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    aria-current={isActive ? "true" : undefined}
+                    className={cn(
+                      "relative inline-flex h-10 items-center rounded-full px-4 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-violet",
+                      pastHero
+                        ? isActive
+                          ? "bg-white/10 text-foreground"
+                          : "text-foreground/70 hover:bg-white/5 hover:text-foreground"
+                        : "text-[#111] hover:bg-black/5",
+                    )}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+
+          <button
+            type="button"
+            onClick={() => toggleOverlay("menu")}
+            aria-label="Open menu"
+            aria-expanded={menuOpen}
+            className={cn(
+              "ms-1 grid h-11 w-11 place-items-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-violet",
+              pastHero
+                ? "border-white/10 bg-white/5 text-foreground hover:bg-white/10"
+                : "border-black/15 text-[#111] hover:bg-black/5",
+            )}
+          >
+            <Menu className="h-5 w-5" />
+          </button>
         </div>
 
-        <Button
-          size="icon"
-          variant="outline"
-          onClick={() => setOpen(!open)}
+        {/* Reading progress along the foot of the pill. */}
+        <span
+          aria-hidden
           className={cn(
-            "bg-transparent md:hidden",
-            pastHero ? "text-foreground" : "border-black/20 text-[#111]",
+            "absolute bottom-0 left-6 right-6 h-px origin-left bg-gradient-to-r from-violet/0 via-violet to-violet transition-opacity duration-500",
+            pastHero ? "opacity-100" : "opacity-0",
           )}
-          aria-expanded={open}
-          aria-controls="mobile-menu"
-          aria-label="Toggle menu"
-        >
-          <MenuToggleIcon open={open} className="size-5" duration={300} />
-        </Button>
+          style={{ transform: `scaleX(${progress})` }}
+        />
       </nav>
-
-      <MobileMenu open={open} className="flex flex-col gap-2">
-        <div className="grid gap-y-2">
-          {NAV.map((link) => (
-            <a
-              key={link.label}
-              onClick={() => setOpen(false)}
-              className={buttonVariants({
-                variant: "ghost",
-                className: "justify-start text-base",
-              })}
-              href={link.href}
-            >
-              {link.label}
-            </a>
-          ))}
-        </div>
-      </MobileMenu>
     </header>
-  );
-}
-
-type MobileMenuProps = React.ComponentProps<"div"> & {
-  open: boolean;
-};
-
-function MobileMenu({ open, children, className, ...props }: MobileMenuProps) {
-  if (!open || typeof window === "undefined") return null;
-
-  return createPortal(
-    <div
-      id="mobile-menu"
-      className={cn(
-        "bg-background/95 supports-[backdrop-filter]:bg-background/80 backdrop-blur-lg",
-        "fixed top-16 right-0 bottom-0 left-0 z-40 flex flex-col overflow-hidden border-y border-border md:hidden",
-      )}
-    >
-      <div
-        data-slot={open ? "open" : "closed"}
-        className={cn(
-          "data-[slot=open]:animate-in data-[slot=open]:zoom-in-97 ease-out",
-          "size-full p-5",
-          className,
-        )}
-        {...props}
-      >
-        {children}
-      </div>
-    </div>,
-    document.body,
   );
 }

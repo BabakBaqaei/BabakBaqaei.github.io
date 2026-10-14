@@ -56,9 +56,47 @@ StackedCircularFooter id="contact" - this IS the contact section
 | `src/content/resume.ts` | career roles (**oldest first**), skill groups, certificates, cert image |
 | `src/content/labels.ts` | hero role labels + measured face landmarks |
 
+## Glass chrome and sections (2026-10-14)
+
+Design direction from the ui-ux-pro-max skill (Liquid Glass, scroll
+storytelling with a progress indicator, staggered card entrances, its
+pre-delivery checklist). Its suggested palette (gold on light) was **not**
+taken: the violet-on-dark page is fixed.
+
+- **One glass material**: `.glass` / `.glass-strong` in `index.css`
+  (`@layer components`, so a utility shadow on the element still wins).
+- **Header** (`header-1.tsx`): ink links over the white hero; past the hero it
+  gathers into a floating glass pill with the current section lit and a
+  reading-progress hairline. The menu button opens the side menu on all sizes.
+- **Side menu** (`side-menu.tsx`), **sheet + FAB** (`quick-sheet.tsx`),
+  **tab bar** (`tab-bar.tsx`, phones only, FAB raised in its centre). One
+  open-panel value in `lib/overlay-store.ts`, so opening one closes the other
+  and locks page scroll. Panels are always mounted and `inert` +
+  `pointer-events-none` while closed (never wait on a transition to stop
+  catching clicks). `hooks/useDialog.ts`: focus in, Tab cycles, Esc closes,
+  focus returns.
+- **Active section** (`hooks/useActiveSection.ts`) by rect + poll, as everywhere.
+- **Phones**: body has bottom padding for the tab bar; the hero's role labels
+  sit above it; the hero scenery is not drawn below md (it only poked in at
+  the crop edges).
+- **Experience** = Babak's `how-it-works` component (`components/ui`),
+  re-dressed in glass with the hero palette (violet hotel / mustard markets /
+  teal web), card tops measured so the section stays within the old footprint
+  (1002 vs 1021px at 1440). Cards and path appear *and disappear* with the
+  scroll in both directions (`useScrollPresence` / `useScrollProgress`, each
+  card exposes `data-present` for testing). Standing portrait on the right:
+  `public/images/experience-standing.webp`, cut out of
+  `Desktop/ax/Man_adjusting_wristwatch_2K_202609012248.jpeg`.
+- **Certificates**: both Samadi documents side by side (second one added:
+  Financial Intelligence Program, SCA-FI-2026-000013), the rest as a glass grid.
+- **Testing in the hidden browser pane**: it does not scroll and freezes rAF
+  and transitions, so read state from the DOM (`data-present`, clip values)
+  and use a temporary `?only=<section>` route for screenshots - remove it
+  before committing.
+
 ## Next (as of 2026-10-14)
 
-- Hero work is committed locally (4 commits ahead of origin) and **not pushed**:
+- Hero work is committed locally (several commits ahead of origin) and **not pushed**:
   push = live deploy, wait for Babak's go-ahead.
 - Figma: file "Babak Baghaei — Hero" https://www.figma.com/design/NAst3jix0Qw4VjXxS5pga8
   (rest / cursor right / cursor left frames). Frames 4:2-6:2 are the good

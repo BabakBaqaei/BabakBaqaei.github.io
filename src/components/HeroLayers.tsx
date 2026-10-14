@@ -217,7 +217,9 @@ export function HeroLayers() {
       {/* Scenery: behind the person, drifting less than they do. */}
       <div
         ref={decorRef}
-        className="absolute inset-0"
+        // On phones the cover crop shows only the face; the scenery would
+        // poke in at the edges as stray fragments, so it is not drawn there.
+        className="absolute inset-0 max-md:hidden"
         style={{ willChange: "transform" }}
       >
         <HeroDecor />
