@@ -27,6 +27,7 @@ import { HeroDecor } from "@/components/HeroDecor";
  */
 const PHOTO_SRC = "/images/hero/photo.webp";
 const FANTASY_SRC = "/images/hero/fantasy.webp";
+const SPLASH_SRC = "/images/hero/fantasy-splash.webp";
 const PHOTO_EYES = "/images/hero/photo-eyes.webp";
 const FANTASY_EYES = "/images/hero/fantasy-eyes.webp";
 
@@ -252,6 +253,24 @@ export function HeroLayers() {
           />
           <EyeStrip src={PHOTO_EYES} stepRef={photoEyesRef} />
         </div>
+
+        {/* The illustration's paint splash on the wall, as its own layer so it
+            fades with the left label and scenery (same --op-left and the same
+            transition), all at once. Baked into the illustration it could only
+            go when the seam swept over it, a beat after everything else. */}
+        <img
+          src={SPLASH_SRC}
+          alt=""
+          aria-hidden
+          width={SRC_W}
+          height={SRC_H}
+          draggable={false}
+          className={fill}
+          style={{
+            opacity: "var(--op-left, 1)",
+            transition: "opacity var(--dur-left, 160ms) linear",
+          }}
+        />
 
         {/* Illustration: on top, cut at the seam. The inline clip is the resting
           state (seam on the nose line), so the split holds without any script. */}

@@ -269,6 +269,13 @@ across the site on 2026-09-02.
   edge differs to 0.81. When the splash moved and the end still said 0.2, two
   strokes stayed on screen at full photo. Re-measure after regenerating
   fantasy.webp.
+- **The wall splash is its own layer** (`fantasy-splash.webp`, written by
+  `hero-cutout.py`), with the same `--op-left` opacity and transition as the
+  left label and scenery, so all three fade together. Baked into the
+  illustration it vanished only when the seam swept over it, a beat late.
+- **Live BTC/USD** in the left scenery (`hooks/useBtcTicker.ts`): Binance 24h
+  ticker, else Coinbase Exchange stats, else a fixed recent quote; refreshed
+  every minute while visible. Falling quotes show in muted red.
 - **Hotel drawing v3**: Art Deco wings + tower on one FLOOR grid (windows
   centred in their bands, floor lines on band boundaries), crown, spire,
   fins, canopy, stars. v2 had floor lines and windows on different grids.

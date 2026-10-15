@@ -94,8 +94,12 @@ near_head = gaussian_filter((h > 0.5).astype(float), 10) > 0.01
 fa = np.where(near_head & (alpha < 0.98), np.maximum(h, wa), fa)
 # Wall paint carries its own alpha and pure paint colour (un-premultiplied).
 paint_only = (wa > 0) & (alpha < 0.02) & (h < 0.02)
-rgb = ill.copy()
-rgb[paint_only] = wrgb[paint_only]
-rgba(rgb, fa).save(f"{OUT}/fantasy.webp", "WEBP", quality=90, method=6, exact=True)
-for f in ("photo.webp", "fantasy.webp", "photo-eyes.webp"):
+# The wall splash is its own layer (fantasy-splash.webp): baked into the
+# illustration it could only vanish when the seam swept over it, a beat after
+# the left label had already faded. As a layer it fades with the label.
+fa_person = np.where(paint_only, 0.0, fa)
+rgba(ill, fa_person).save(f"{OUT}/fantasy.webp", "WEBP", quality=90, method=6, exact=True)
+splash_a = np.where(paint_only, wa, 0.0)
+rgba(wrgb, splash_a).save(f"{OUT}/fantasy-splash.webp", "WEBP", quality=90, method=6, exact=True)
+for f in ("photo.webp", "fantasy.webp", "fantasy-splash.webp", "photo-eyes.webp"):
     print(f, os.path.getsize(f"{OUT}/{f}") // 1024, "KB")

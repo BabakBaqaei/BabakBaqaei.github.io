@@ -1,11 +1,12 @@
 import "@fontsource/jetbrains-mono/400.css";
+import { formatPrice, useBtcTicker } from "@/hooks/useBtcTicker";
 
 /**
  * The faint scenery behind each shoulder, in the 1920x1080 coordinates of the
  * hero frame (the SVG's viewBox is that frame, drawn into the same
  * cover-sized box as the portrait).
  *
- *   left   coding + trading - mono code, a pair quote, a small candle chart
+ *   left   coding + trading - mono code, a live BTC/USD quote, a candle chart
  *   right  the hotel        - one line-drawn grand hotel under five stars
  *
  * Placed against the measured shoulder line (source px): left shoulder rises
@@ -211,7 +212,14 @@ function GrandHotel({ x, y }: { x: number; y: number }) {
   );
 }
 
+/** Muted red for a falling quote, matched in weight to the violet accent. */
+const DOWN = "#D98A8A";
+
 export function HeroDecor() {
+  // Live BTC/USD (falls back to a recent fixed quote) - see useBtcTicker.
+  const btc = useBtcTicker();
+  const up = btc.changePct >= 0;
+
   return (
     <svg
       viewBox="0 0 1920 1080"
@@ -234,12 +242,12 @@ export function HeroDecor() {
           {"const edge = winRate * rr - (1 - winRate);"}
         </text>
         <text x={392} y={708} fontSize={40} fill={FAINT} letterSpacing={-1}>
-          EUR/USD
+          BTC/USD
         </text>
         <text x={394} y={736} fontSize={16} fill={SOFT}>
-          1.0842
-          <tspan fill={ACCENT} fillOpacity={0.6} dx={10}>
-            ▲ 0.31%
+          {formatPrice(btc.price)}
+          <tspan fill={up ? ACCENT : DOWN} fillOpacity={0.75} dx={10}>
+            {up ? "▲" : "▼"} {Math.abs(btc.changePct).toFixed(2)}%
           </tspan>
         </text>
         <CandleChart x={588} y={664} w={170} h={86} />
