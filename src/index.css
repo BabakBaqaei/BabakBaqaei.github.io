@@ -151,7 +151,9 @@ body {
     top: 0;
     bottom: auto;
     transform: translateY(-50%);
-    color: #111;
+    /* The reference's "designer" / "<coder>" ink, sampled off the recording:
+       #333333 in every glyph core across six frames. */
+    color: #333333;
     text-shadow: none;
   }
 }
