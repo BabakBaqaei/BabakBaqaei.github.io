@@ -92,75 +92,121 @@ function star(cx: number, cy: number, r: number) {
 }
 
 /**
- * A grand hotel, line-drawn: two wings and a central tower, a cornice per
- * block, a window grid, a canopied entrance, a flag, five stars on an arc.
- * Local origin is the bottom-left of the building; y grows downward as usual.
+ * An Art Deco grand hotel, line-drawn on one strict grid so nothing collides:
+ *
+ *   - every floor is a FLOOR-high band; a window sits centred in its band
+ *     (7px clear above and below), and the floor lines fall exactly on the
+ *     band boundaries - between windows, never through them;
+ *   - two five-storey wings and an eight-storey central tower, each with its
+ *     own cornice, the tower stepping up to a crown and a spire;
+ *   - fine vertical fins between the tower's window columns (the Deco
+ *     rhythm), an entrance with a canopy and an arched door in the tower's
+ *     ground floor, the name in the crown, five stars on an arc above.
+ *
+ * Local origin is the bottom-left of the building, y up is negative.
  */
+const FLOOR = 30;
+const WIN_W = 10;
+const WIN_H = 16;
+
+type Block = { x: number; w: number; floors: number; cols: number[] };
+
+const LEFT_WING: Block = { x: 0, w: 96, floors: 5, cols: [10, 32, 54, 76] };
+const RIGHT_WING: Block = { x: 244, w: 96, floors: 5, cols: [10, 32, 54, 76] };
+const TOWER: Block = { x: 96, w: 148, floors: 8, cols: [13, 41, 69, 97, 125] };
+
+/** Ground-floor tower bays kept clear for the entrance. */
+const ENTRANCE_COLS = new Set([41, 69, 97]);
+
+function BlockFacade({ b, entrance = false }: { b: Block; entrance?: boolean }) {
+  // The tower carries the crown instead of a parapet (they would overlap).
+  const top = -b.floors * FLOOR;
+  return (
+    <g>
+      <rect x={b.x} y={top} width={b.w} height={-top} />
+      {/* cornice + parapet */}
+      <line x1={b.x - 5} x2={b.x + b.w + 5} y1={top} y2={top} strokeWidth={2.4} />
+      {!entrance && <rect x={b.x + 4} y={top - 7} width={b.w - 8} height={7} stroke={FAINT} />}
+      {/* floor lines on the band boundaries */}
+      {Array.from({ length: b.floors - 1 }, (_, i) => -(i + 1) * FLOOR).map((y) => (
+        <line key={y} x1={b.x} x2={b.x + b.w} y1={y} y2={y} stroke={FAINT} strokeWidth={1} />
+      ))}
+      {/* windows, centred in each band */}
+      {Array.from({ length: b.floors }, (_, f) =>
+        b.cols.map((c) => {
+          if (entrance && f === 0 && ENTRANCE_COLS.has(c)) return null;
+          const y = -(f + 1) * FLOOR + (FLOOR - WIN_H) / 2;
+          return (
+            <rect
+              key={`${f}-${c}`}
+              x={b.x + c}
+              y={y}
+              width={WIN_W}
+              height={WIN_H}
+              rx={f === b.floors - 1 ? 5 : 1}
+              stroke={FAINT}
+              strokeWidth={1.2}
+            />
+          );
+        }),
+      )}
+    </g>
+  );
+}
+
 function GrandHotel({ x, y }: { x: number; y: number }) {
-  const floors = 6;
-  const floorH = 34;
-  const top = -floors * floorH - 18; // main block roof
-  const windows: { x: number; y: number }[] = [];
-  for (let f = 0; f < floors; f++) {
-    for (let c = 0; c < 11; c++) {
-      const wx = 46 + c * 22;
-      const wy = -28 - f * floorH - 16;
-      // keep the entrance bay clear on the ground floor
-      if (f === 0 && wx > 128 && wx < 196) continue;
-      windows.push({ x: wx, y: wy });
-    }
-  }
+  const towerTop = -TOWER.floors * FLOOR; // -240
+  const cx = TOWER.x + TOWER.w / 2; // 170
+  // Vertical fins between the tower's window columns, above the ground floor.
+  const fins = TOWER.cols.slice(0, -1).map((c, i) => TOWER.x + (c + WIN_W + TOWER.cols[i + 1]) / 2);
+
   return (
     <g transform={`translate(${x} ${y})`} fill="none" stroke={SOFT} strokeWidth={1.5} strokeLinejoin="round">
-      {/* stars on an arc over the tower */}
+      {/* five stars on an arc over the spire */}
       {[-2, -1, 0, 1, 2].map((k) => (
         <polygon
           key={k}
-          points={star(160 + k * 30, top - 128 + Math.abs(k) * 7, 10)}
+          points={star(cx + k * 24, towerTop - 112 + Math.abs(k) * 6, k === 0 ? 9 : 8)}
           fill={k === 0 ? ACCENT : SOFT}
-          fillOpacity={k === 0 ? 0.55 : 1}
+          fillOpacity={k === 0 ? 0.6 : 1}
           stroke="none"
         />
       ))}
-      {/* flag */}
-      <line x1={160} x2={160} y1={top - 62} y2={top - 100} />
-      <path d="M 160 -100 l 22 6 l -22 6 z" transform={`translate(0 ${top})`} fill={FAINT} />
-      {/* central tower */}
-      <rect x={118} y={top - 62} width={84} height={62} />
-      <path d={`M 112 ${top - 62} L 160 ${top - 82} L 208 ${top - 62}`} />
-      <circle cx={160} cy={top - 38} r={11} />
-      <line x1={160} x2={160} y1={top - 44} y2={top - 38} />
-      <line x1={160} x2={166} y1={top - 38} y2={top - 38} />
-      {/* main block + cornices */}
-      <rect x={30} y={top} width={260} height={-top} />
-      <line x1={22} x2={298} y1={top} y2={top} strokeWidth={2.5} />
-      <line x1={30} x2={290} y1={top + 14} y2={top + 14} stroke={FAINT} />
-      {[1, 2, 3, 4, 5].map((f) => (
-        <line key={f} x1={30} x2={290} y1={-f * floorH - 10} y2={-f * floorH - 10} stroke={FAINT} strokeWidth={1} />
-      ))}
-      {/* windows */}
-      {windows.map((w, i) => (
-        <rect key={i} x={w.x} y={w.y} width={10} height={16} rx={1} stroke={FAINT} />
-      ))}
-      {/* entrance: canopy, doors, sign */}
-      <path d="M 120 -44 L 200 -44 L 192 -34 L 128 -34 Z" fill={FAINT} />
-      <line x1={132} x2={132} y1={-34} y2={0} />
-      <line x1={188} x2={188} y1={-34} y2={0} />
-      <path d="M 146 0 L 146 -22 A 14 14 0 0 1 174 -22 L 174 0" />
+
+      {/* crown: two steps and a spire */}
+      <rect x={TOWER.x + 20} y={towerTop - 24} width={TOWER.w - 40} height={24} />
+      <rect x={TOWER.x + 44} y={towerTop - 44} width={TOWER.w - 88} height={20} />
+      <path d={`M ${cx - 10} ${towerTop - 44} L ${cx} ${towerTop - 80} L ${cx + 10} ${towerTop - 44}`} />
+      <line x1={cx} x2={cx} y1={towerTop - 80} y2={towerTop - 90} />
       <text
-        x={160}
-        y={-54}
+        x={cx}
+        y={towerTop - 8}
         textAnchor="middle"
         fontFamily={MONO}
-        fontSize={11}
+        fontSize={10}
         letterSpacing={5}
         fill={SOFT}
         stroke="none"
       >
         HOTEL
       </text>
-      {/* ground */}
-      <line x1={-10} x2={330} y1={0} y2={0} strokeWidth={2} />
+
+      <BlockFacade b={LEFT_WING} />
+      <BlockFacade b={RIGHT_WING} />
+      <BlockFacade b={TOWER} entrance />
+
+      {fins.map((fx) => (
+        <line key={fx} x1={fx} x2={fx} y1={towerTop + 4} y2={-FLOOR} stroke={FAINT} strokeWidth={0.9} />
+      ))}
+
+      {/* entrance: canopy over an arched door */}
+      <path d={`M ${cx - 34} ${-FLOOR + 6} L ${cx + 34} ${-FLOOR + 6} L ${cx + 28} ${-FLOOR + 12} L ${cx - 28} ${-FLOOR + 12} Z`} fill={FAINT} />
+      <path d={`M ${cx - 11} 0 L ${cx - 11} -10 A 11 11 0 0 1 ${cx + 11} -10 L ${cx + 11} 0`} />
+      <line x1={cx} x2={cx} y1={-18} y2={0} stroke={FAINT} />
+
+      {/* plinth and ground line */}
+      <line x1={-12} x2={352} y1={0} y2={0} strokeWidth={2} />
+      <line x1={-24} x2={364} y1={6} y2={6} stroke={FAINT} />
     </g>
   );
 }

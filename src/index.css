@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* `dark:` follows a .dark class, not the visitor's OS setting: the site is
+   dark-only, and components written for both themes (the Experience
+   how-it-works board) must not turn white for someone in light mode. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   /* ── Palette ─────────────────────────────────────────────────────────
      Derived from the one fixed decision in the brief: the page sits on

@@ -19,6 +19,7 @@ export default function App() {
   useCursorSplit();
 
 
+
   return (
     <>
       {/* One fixed backdrop for the whole document, so the gradient does not

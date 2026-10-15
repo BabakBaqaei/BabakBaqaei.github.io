@@ -41,18 +41,23 @@ const GAZE_FULL_AT = 0.55;
 /**
  * Seam position in source x against reveal. Measured on the frame: the head
  * spans x 0.382-0.613 and the illustration (with its wall splashes) differs
- * from the photo only within x 0.209-0.614. So the seam spends almost all of
+ * from the photo only within x 0.117-0.81. So the seam spends almost all of
  * the cursor's travel crossing the face, then clears the splashes at the end.
  */
+// The ends must clear *everything* the illustration adds: its paint splash
+// now reaches x 0.117 (re-measure after re-generating fantasy.webp, or a
+// stray stroke stays on screen at full reveal - which is what happened when
+// the splash moved and this end still said 0.2) and its edge differs from the
+// photo out to x 0.81 on the other side.
 const TOWARD_PHOTO: ReadonlyArray<readonly [number, number]> = [
   [0, 0.5],
   [0.88, 0.375],
-  [1, 0.2],
+  [1, 0.1],
 ];
 const TOWARD_FANTASY: ReadonlyArray<readonly [number, number]> = [
   [0, 0.5],
   [0.92, 0.62],
-  [1, 0.62],
+  [1, 0.83],
 ];
 
 /**

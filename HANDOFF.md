@@ -79,13 +79,18 @@ taken: the violet-on-dark page is fixed.
 - **Phones**: body has bottom padding for the tab bar; the hero's role labels
   sit above it; the hero scenery is not drawn below md (it only poked in at
   the crop edges).
-- **Experience** = Babak's `how-it-works` component (`components/ui`),
-  re-dressed in glass with the hero palette (violet hotel / mustard markets /
-  teal web), card tops measured so the section stays within the old footprint
-  (1002 vs 1021px at 1440). Cards and path appear *and disappear* with the
-  scroll in both directions (`useScrollPresence` / `useScrollProgress`, each
-  card exposes `data-present` for testing). Standing portrait on the right:
-  `public/images/experience-standing.webp`, cut out of
+- **Experience** = Babak's `how-it-works` component **exactly as supplied**
+  (`components/ui/how-it-works.tsx`: its 1000x1130 board, positions, tilts,
+  colours, Comic Sans numbers, the dashed path joining all five cards). A
+  first version re-laid it out to fit the old footprint and he rejected it:
+  do not alter the component's layout or look. The only addition is in Card:
+  each card appears as it scrolls in and disappears as it leaves, one by one,
+  both directions, every pass (`useScrollPresence`, `data-present`). It sits
+  in a `.dark` wrapper; `dark:` is class-based now (`@custom-variant` in
+  index.css) so it never turns white for a visitor in light mode. Board left,
+  sticky standing portrait right from `xl` (the board needs ~1000px for its
+  left/right cards to clear); below xl the portrait sits above.
+  Portrait: `public/images/experience-standing.webp`, cut out of
   `Desktop/ax/Man_adjusting_wristwatch_2K_202609012248.jpeg`.
 - **Certificates**: both Samadi documents side by side (second one added:
   Financial Intelligence Program, SCA-FI-2026-000013), the rest as a glass grid.
@@ -259,6 +264,14 @@ across the site on 2026-09-02.
 - **Seam overlap.** The photo layer reaches `SEAM_OVERLAP` (0.15%, ~3 source
   px) under the illustration. Two clips meeting on a fractional pixel left a
   white hairline down the tie and suit.
+- **Seam ends must clear the whole illustration.** `TOWARD_PHOTO` ends at x
+  0.10 and `TOWARD_FANTASY` at 0.83: the paint splash reaches 0.117 and the
+  edge differs to 0.81. When the splash moved and the end still said 0.2, two
+  strokes stayed on screen at full photo. Re-measure after regenerating
+  fantasy.webp.
+- **Hotel drawing v3**: Art Deco wings + tower on one FLOOR grid (windows
+  centred in their bands, floor lines on band boundaries), crown, spire,
+  fins, canopy, stars. v2 had floor lines and windows on different grids.
 - **Scenery v2.** Right side is now one line-drawn grand hotel under five stars
   (no text), its base and near wing behind the right shoulder. Left: two code
   lines that run in behind the neck, EUR/USD, a candle chart sinking behind the
